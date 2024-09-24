@@ -124,17 +124,49 @@ bool drawWireframe = false;     // Draw polygons in wireframe if true, otherwise
 
 void DrawOneCar( float bodyColor[3] )
 {
-    glColor3fv(bodyColor);
-
+    //main body
+    glPushMatrix();
+        glScaled(1, CAR_WIDTH / CAR_LENGTH, CAR_HEIGHT / (2 * CAR_LENGTH));
+        glColor3fv(bodyColor);
+        glutSolidCube(CAR_LENGTH);
+    glPopMatrix();
     
+    //upper body
+    glPushMatrix();
+        glTranslated(0, 0, CAR_HEIGHT / 2);
+        glScaled(1, 1, CAR_HEIGHT / (2 * CAR_WIDTH));
+        glColor3fv(bodyColor);
+        glutSolidCube(CAR_WIDTH);
+    glPopMatrix();
 
-    glColor3fv(tyreColor);
+    //tyres
+    glPushMatrix();
+        glTranslated(- CAR_LENGTH / 2, - CAR_WIDTH / 2, 0);
+        glRotated(90, 1, 0, 0);
+        glColor3fv(tyreColor);
+        glutSolidTorus(4, 8, 30, 30);
+    glPopMatrix();
 
-    //****************************
-    // WRITE YOUR CODE HERE.
-    //
-    // Draw the four tyres.
-    //****************************
+    glPushMatrix();
+        glTranslated(- CAR_LENGTH / 2, CAR_WIDTH / 2, 0);
+        glRotated(90, 1, 0, 0);
+        glColor3fv(tyreColor);
+        glutSolidTorus(4, 8, 30, 30);
+    glPopMatrix();
+
+    glPushMatrix();
+        glTranslated(CAR_LENGTH / 2, -CAR_WIDTH / 2, 0);
+        glRotated(90, 1, 0, 0);
+        glColor3fv(tyreColor);
+        glutSolidTorus(4, 8, 30, 30);
+    glPopMatrix();
+
+    glPushMatrix();
+        glTranslated(CAR_LENGTH / 2, CAR_WIDTH / 2, 0);
+        glRotated(90, 1, 0, 0);
+        glColor3fv(tyreColor);
+        glutSolidTorus(4, 8, 30, 30);
+    glPopMatrix();
 }
 
 
@@ -147,9 +179,11 @@ void DrawAllCars( void )
 {
     for ( int i = 0; i < NUM_CARS; i++ )
     {
-        //****************************
-        // WRITE YOUR CODE HERE.
-        //****************************
+        glPushMatrix();
+        glRotated(car[i].rotAngle, car[i].xzAxis[0], 0, car[i].xzAxis[1]);
+        glTranslated(0, PLANET_RADIUS, 0);
+        DrawOneCar(car[i].bodyColor);
+        glPopMatrix();
     }
 }
 
