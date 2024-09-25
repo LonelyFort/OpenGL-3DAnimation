@@ -141,31 +141,31 @@ void DrawOneCar( float bodyColor[3] )
 
     //tyres
     glPushMatrix();
-        glTranslated(- CAR_LENGTH / 2, - CAR_WIDTH / 2, 0);
+        glTranslated(- CAR_LENGTH / 4, - (CAR_WIDTH / 2 + CAR_HEIGHT / 8), CAR_HEIGHT / 4);
         glRotated(90, 1, 0, 0);
         glColor3fv(tyreColor);
-        glutSolidTorus(4, 8, 30, 30);
+        glutSolidTorus(CAR_HEIGHT / 8, CAR_HEIGHT / 4, 30, 30);
     glPopMatrix();
 
     glPushMatrix();
-        glTranslated(- CAR_LENGTH / 2, CAR_WIDTH / 2, 0);
+        glTranslated(- CAR_LENGTH / 4, CAR_WIDTH / 2 + CAR_HEIGHT / 8, CAR_HEIGHT / 4);
         glRotated(90, 1, 0, 0);
         glColor3fv(tyreColor);
-        glutSolidTorus(4, 8, 30, 30);
+        glutSolidTorus(CAR_HEIGHT / 8, CAR_HEIGHT / 4, 30, 30);
     glPopMatrix();
 
     glPushMatrix();
-        glTranslated(CAR_LENGTH / 2, -CAR_WIDTH / 2, 0);
+        glTranslated(CAR_LENGTH / 4, -(CAR_WIDTH / 2 + CAR_HEIGHT / 12), CAR_HEIGHT / 6);
         glRotated(90, 1, 0, 0);
         glColor3fv(tyreColor);
-        glutSolidTorus(4, 8, 30, 30);
+        glutSolidTorus(CAR_HEIGHT / 12, CAR_HEIGHT / 6, 30, 30);
     glPopMatrix();
 
     glPushMatrix();
-        glTranslated(CAR_LENGTH / 2, CAR_WIDTH / 2, 0);
+        glTranslated(CAR_LENGTH / 4, CAR_WIDTH / 2 + CAR_HEIGHT / 12, CAR_HEIGHT / 6);
         glRotated(90, 1, 0, 0);
         glColor3fv(tyreColor);
-        glutSolidTorus(4, 8, 30, 30);
+        glutSolidTorus(CAR_HEIGHT / 12, CAR_HEIGHT / 6, 30, 30);
     glPopMatrix();
 }
 
@@ -180,9 +180,10 @@ void DrawAllCars( void )
     for ( int i = 0; i < NUM_CARS; i++ )
     {
         glPushMatrix();
-        glRotated(car[i].rotAngle, car[i].xzAxis[0], 0, car[i].xzAxis[1]);
-        glTranslated(0, PLANET_RADIUS, 0);
-        DrawOneCar(car[i].bodyColor);
+            glRotated(car[i].rotAngle, car[i].xzAxis[0], 0, car[i].xzAxis[1]);
+            glRotated(car[i].angularPos, 0, 1, 0);
+            glTranslated(0, 0, PLANET_RADIUS);
+            DrawOneCar(car[i].bodyColor);
         glPopMatrix();
     }
 }
@@ -240,7 +241,7 @@ void MyDisplay( void )
     // the predefined constant CLIP_PLANE_DIST to position your near and
     // far planes.
     //***********************************************************************
-    gluPerspective( VERT_FOV, (double)winWidth / winHeight, 50.0, 600.0 );
+    gluPerspective( VERT_FOV, (double)winWidth / winHeight, eyeDistance - CLIP_PLANE_DIST, eyeDistance + CLIP_PLANE_DIST );
 
 
     glMatrixMode( GL_MODELVIEW );
@@ -251,8 +252,10 @@ void MyDisplay( void )
     //
     // Modify the following line of code to set up the view transformation.
     // You may use the gluLookAt() function, but you can use other method.
-    //***********************************************************************
-    gluLookAt( 0.0, 0.0, eyeDistance, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0 );
+    //**********************************************************************
+    gluLookAt( eyeDistance * sin(eyeLongitude / 180 * PI) * cos(eyeLatitude / 180 * PI),
+               eyeDistance * sin(eyeLatitude / 180 * PI),
+               eyeDistance * cos(eyeLongitude / 180 * PI) * cos(eyeLatitude / 180 * PI), 0.0, 0.0, 0.0, 0.0, 1.0, 0.0);
 
 
     // Set world positions of the two lights.
@@ -327,9 +330,8 @@ void MyTimer( int v )
 {
     if ( !pauseAnimation )
     {
-        //****************************
-        // WRITE YOUR CODE HERE.
-        //****************************
+        glutTimerFunc(1000 / DESIRED_FPS, MyTimer, v);
+        UpdateCars();
     }
 }
 
